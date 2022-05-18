@@ -13,10 +13,12 @@ code by eye.
 NOTE: We do not expect you to come up with a perfect solution. We are more interested
 in how you would approach a problem like this.
 """
+from ast import operator
 import json
 import re
 
 courseCodes = ["comp", "dpst", "elec", "math", "mtrn"]
+operators = ["and", "or", "(", ")"]
 
 # NOTE: DO NOT EDIT conditions.json
 with open("./conditions.json") as f:
@@ -42,13 +44,14 @@ def is_unlocked(courses_list, target_course):
         return
     array = normalise(CONDITIONS[target_course]).split()
     for i in array:
-        if (not isCourseCode(i)) and (i != "or"):
+        if (not isCourseCode(i)) and i not in operators:
             return
         elif isCourseCode(i):
             if done(i.upper(), courses_list):
                 array[array.index(i)] = "True"
             else:
                 array[array.index(i)] = "False"
+    #print(array)
     #print("{}: {}".format(target_course, normalise(CONDITIONS[target_course])))
     #print(eval(" ".join(array)))
     return eval(" ".join(array))
@@ -60,6 +63,9 @@ def normalise(conditions):
     conditions = conditions.strip(".")
     # remove prerequsite word and variants
     conditions = re.sub(r'^.*?: ', '', conditions)
+    # add spacing around ( and )
+    conditions = conditions.replace("(", "( ")
+    conditions = conditions.replace(")", " )")
     # Uncapitalise everything
     conditions = conditions.lower()
     return conditions
